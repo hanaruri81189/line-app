@@ -1,0 +1,6 @@
+{
+  "name": "LINE Message Optimizer",
+  "description": "An AI-powered tool to transform and optimize your text messages for LINE, adjusting character count, tone, and emojis for better readability.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
