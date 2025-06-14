@@ -14,7 +14,7 @@ const getApiKey = (): string => {
 const genAI = new GoogleGenerativeAI(getApiKey());
 
 /**
- * テキストをLINE用に最適化する関数
+ * テキストをLINE用に最適化する関数（初回生成用）
  * @param originalText 最適化したい元の文章
  * @param charLimit 目標の文字数
  * @param title メッセージのタイトル（任意）
@@ -29,7 +29,6 @@ export const transformTextForLINE = async (
 ): Promise<string> => {
   const model = genAI.getGenerativeModel({ model: GEMINI_MODEL_NAME });
 
-  // AIへの指示（プロンプト）をユーザーの要望に合わせて強化
   const prompt = `
 あなたは、文章をLINE公式アカウント用に最適化するプロの編集者です。
 
@@ -71,10 +70,53 @@ ${originalText}
   try {
     const result = await model.generateContent(prompt);
     const response = result.response;
-    const text = response.text();
-    return text;
+    return response.text();
   } catch (error) {
     console.error("テキストの最適化中にエラーが発生しました:", error);
+    if (error instanceof Error) {
+        throw new Error(`AIとの通信中にエラーが発生しました: ${error.message}`);
+    }
+    throw new Error("AIとの通信中に不明なエラーが発生しました。");
+  }
+};
+
+
+/**
+ * 生成されたテキストをさらに手直しする関数（チャットでの修正用）
+ * @param textToRefine 修正対象のテキスト
+ * @param instruction ユーザーからの修正指示
+ * @returns 手直しされた新しいテキスト
+ */
+export const refineText = async (
+  textToRefine: string,
+  instruction: string
+): Promise<string> => {
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL_NAME });
+
+  const prompt = `
+あなたはプロの編集者です。以下の「# 修正対象の文章」を、与えられた「# 修正指示」に従って修正してください。
+
+# 修正対象の文章:
+---
+${textToRefine}
+---
+
+# 修正指示:
+「${instruction}」
+
+# ルール:
+- 指示を忠実に反映し、文章を修正してください。
+- 元の文章の重要な意図や情報は維持してください。
+- 最終的な出力は、修正された文章の全文のみにしてください。
+- 説明や前置きは一切含めないでください。
+`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    return response.text();
+  } catch (error) {
+    console.error("テキストの修正中にエラーが発生しました:", error);
     if (error instanceof Error) {
         throw new Error(`AIとの通信中にエラーが発生しました: ${error.message}`);
     }
