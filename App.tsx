@@ -19,6 +19,122 @@ interface ChatMessage {
   text: string; 
   timestamp: Date;
 }
+<<<<<<< HEAD
+=======
+const Button: FC<ButtonProps> = ({ children, className, variant = 'primary', ...props }) => {
+  const baseStyles = "inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed";
+  const variantStyles = {
+    primary: "text-white bg-green-600 hover:bg-green-700 focus:ring-green-500",
+    secondary: "text-gray-700 bg-gray-200 hover:bg-gray-300 focus:ring-gray-400",
+    chat: "text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-400 px-4 py-2 text-sm"
+  };
+  return (
+    <button {...props} className={`${baseStyles} ${variantStyles[variant]} ${className}`}>
+      {children}
+    </button>
+  );
+};
+
+// 猫キャラクター対応版ローディングスピナー
+const CatLoadingSpinner: FC = () => (
+  <div className="flex flex-col items-center justify-center p-6 bg-green-50 rounded-lg">
+    <img 
+      src="https://i.imgur.com/8NNEFhO.png" 
+      alt="作成中の猫キャラクター" 
+      className="w-32 h-32 animate-bounce"
+    />
+    <p className="mt-4 text-lg font-semibold text-green-800">ただいま、もっと良い文章を作成中ニャ...🐾</p>
+  </div>
+);
+
+
+interface AlertProps { message: string; type: 'success' | 'error'; onClose: () => void; }
+const Alert: FC<AlertProps> = ({ message, type, onClose }) => {
+  const alertStyles = type === 'success' ? 'bg-green-100 border-green-500 text-green-700' : 'bg-red-100 border-red-500 text-red-700';
+  return (
+    <div className={`p-4 border-l-4 ${alertStyles} rounded-md shadow-md flex justify-between items-center`}>
+      <p>{message}</p>
+      <button onClick={onClose} className="p-1 rounded-full hover:bg-black/10 transition-colors">&times;</button>
+    </div>
+  );
+};
+
+interface OutputDisplayProps {
+  text: string;
+  onCopy: () => void;
+  isLoading: boolean;
+  charCount: number;
+  limit: number;
+  onTextChange: (newText: string) => void;
+}
+const OutputDisplay: FC<OutputDisplayProps> = ({ text, onCopy, isLoading, charCount, limit, onTextChange }) => (
+    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 mt-6 animate-fade-in">
+        <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-semibold text-gray-800">最適化された文章</h3>
+            <Button onClick={onCopy} variant="secondary" className="px-4 py-2 text-sm" disabled={!text}>コピー</Button>
+        </div>
+        {isLoading ? (
+            <div className="flex justify-center items-center h-48 bg-gray-100 rounded-md">
+                <CatLoadingSpinner />
+            </div>
+        ) : (
+            <TextAreaInput
+                value={text}
+                onChange={(e) => onTextChange(e.target.value)}
+                rows={8}
+                aria-label="最適化された文章の出力エリア"
+            />
+        )}
+        <div className="text-right text-sm text-gray-500 mt-2">
+            <span className={charCount > limit ? 'text-red-500 font-bold' : 'text-gray-600'}>
+                {charCount}
+            </span> / {limit} 字
+        </div>
+    </div>
+);
+
+// 新しいチャットでの修正用コンポーネント
+interface ChatRefinementProps {
+    onRefine: (instruction: string) => Promise<void>;
+    isRefining: boolean;
+}
+const ChatRefinement: FC<ChatRefinementProps> = ({ onRefine, isRefining }) => {
+    const [instruction, setInstruction] = useState('');
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!instruction.trim() || isRefining) return;
+        onRefine(instruction);
+        setInstruction('');
+    };
+
+    return (
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg animate-fade-in">
+            <h3 className="text-lg font-semibold text-blue-800 mb-2">もっとこうして！(追加指示)</h3>
+            {isRefining ? (
+                <div className="flex justify-center items-center h-24">
+                     <CatLoadingSpinner />
+                </div>
+            ) : (
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                        type="text"
+                        value={instruction}
+                        onChange={(e) => setInstruction(e.target.value)}
+                        placeholder="例: もっと絵文字を増やして、親しみやすくして"
+                        className="flex-grow"
+                        disabled={isRefining}
+                    />
+                    <Button type="submit" variant="chat" disabled={!instruction.trim() || isRefining}>
+                        指示を送る
+                    </Button>
+                </form>
+            )}
+        </div>
+    );
+};
+
+>>>>>>> 68d51c6791b4d382761d8ee847393c71eb0eafe2
 
 const App: React.FC = () => {
   const [title, setTitle] = useState<string>('');
@@ -302,6 +418,7 @@ const App: React.FC = () => {
              />
           )}
 
+<<<<<<< HEAD
           {chatSession && !isLoading && ( // Show chat interface if session exists and not initial loading
             <div className="mt-6 space-y-4">
               <ChatHistoryWindow messages={chatMessages} ref={chatHistoryRef} />
@@ -318,6 +435,10 @@ const App: React.FC = () => {
                 </div>
               )}
             </div>
+=======
+          {optimizedText && !isLoading && !isRefining && (
+            <ChatRefinement onRefine={handleRefine} isRefining={isRefining} />
+>>>>>>> 68d51c6791b4d382761d8ee847393c71eb0eafe2
           )}
         </div>
       </main>
