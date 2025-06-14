@@ -29,9 +29,13 @@ export const OutputDisplay: React.FC<OutputDisplayProps> = ({ text, onCopy, isLo
         )}
       </div>
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center min-h-[120px] p-3 bg-white border border-slate-200 rounded-md text-slate-500">
-          <LoadingSpinner color="text-blue-500" size="h-8 w-8" />
-          <p className="mt-2 text-sm">AIが文章を調整中です...</p>
+        <div className="flex flex-col items-center justify-center min-h-[160px] p-3 bg-white border border-slate-200 rounded-md text-slate-600">
+          {/* Ensure cat_thinking.png is in public/assets/ and has a transparent background */}
+          <img src="/assets/cat_thinking.png" alt="考え中の可愛らしい猫のイラスト" className="w-24 h-24 mb-3" />
+          <div className="flex items-center">
+            <LoadingSpinner color="text-blue-500" size="h-5 w-5" />
+            <p className="ml-2 text-sm">考え中・・・</p>
+          </div>
         </div>
       ) : text ? (
         <>
