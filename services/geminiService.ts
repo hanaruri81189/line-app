@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { GEMINI_MODEL_NAME } from './constants';
 
 const getApiKey = (): string => {
@@ -11,7 +11,7 @@ const getApiKey = (): string => {
 };
 
 // GoogleGenAIをAPIキーで初期化
-const genAI = new GoogleGenAI({ apiKey: getApiKey() });
+const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
 /**
  * テキストをLINE用に最適化する関数（初回生成用）
@@ -28,7 +28,6 @@ export const transformTextForLINE = async (
   cta?: string
 ): Promise<string> => {
 
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL_NAME });
   const prompt = `
 あなたは、文章をLINE公式アカウント用に最適化するプロの編集者です。
 
@@ -68,9 +67,11 @@ ${originalText}
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text(); // <-- ここを修正しました！
+    const response: GenerateContentResponse = await ai.models.generateContent({
+        model: GEMINI_MODEL_NAME,
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+    });
+    return response.text;
   } catch (error) {
     console.error("テキストの最適化中にエラーが発生しました:", error);
     if (error instanceof Error) {
@@ -92,7 +93,6 @@ export const refineText = async (
   instruction: string
 ): Promise<string> => {
 
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL_NAME });
   const prompt = `
 あなたはプロの編集者です。以下の「# 修正対象の文章」を、与えられた「# 修正指示」に従って修正してください。
 
@@ -112,9 +112,11 @@ ${textToRefine}
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text(); // <-- ここを修正しました！
+    const response: GenerateContentResponse = await ai.models.generateContent({
+        model: GEMINI_MODEL_NAME,
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+    });
+    return response.text;
   } catch (error) {
     console.error("テキストの修正中にエラーが発生しました:", error);
     if (error instanceof Error) {
