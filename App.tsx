@@ -58,7 +58,7 @@ const Button: FC<ButtonProps> = ({ children, className, variant = 'primary', ...
 };
 
 // 猫キャラクター対応版ローディングスピナー
-const LoadingSpinner: FC = () => (
+const CatLoadingSpinner: FC = () => (
   <div className="flex flex-col items-center justify-center p-6 bg-green-50 rounded-lg">
     <img 
       src="https://i.imgur.com/8NNEFhO.png" 
@@ -97,7 +97,7 @@ const OutputDisplay: FC<OutputDisplayProps> = ({ text, onCopy, isLoading, charCo
         </div>
         {isLoading ? (
             <div className="flex justify-center items-center h-48 bg-gray-100 rounded-md">
-                <LoadingSpinner />
+                <CatLoadingSpinner />
             </div>
         ) : (
             <TextAreaInput
@@ -135,7 +135,7 @@ const ChatRefinement: FC<ChatRefinementProps> = ({ onRefine, isRefining }) => {
             <h3 className="text-lg font-semibold text-blue-800 mb-2">もっとこうして！(追加指示)</h3>
             {isRefining ? (
                 <div className="flex justify-center items-center h-24">
-                     <LoadingSpinner />
+                     <CatLoadingSpinner />
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
@@ -302,7 +302,7 @@ const App: React.FC = () => {
              />
           )}
 
-          {optimizedText && !isLoading && (
+          {optimizedText && !isLoading && !isRefining && (
             <ChatRefinement onRefine={handleRefine} isRefining={isRefining} />
           )}
 
