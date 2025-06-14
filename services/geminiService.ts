@@ -1,4 +1,4 @@
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { GEMINI_MODEL_NAME } from './constants';
 
 const getApiKey = (): string => {
@@ -12,6 +12,7 @@ const getApiKey = (): string => {
 
 // GoogleGenAIをAPIキーで初期化
 const genAI = new GoogleGenAI({ apiKey: getApiKey() });
+const model = genAI.getGenerativeModel({ model: GEMINI_MODEL_NAME });
 
 /**
  * テキストをLINE用に最適化する関数（初回生成用）
@@ -67,11 +68,9 @@ ${originalText}
 `;
 
   try {
-    const response: GenerateContentResponse = await genAI.models.generateContent({
-        model: GEMINI_MODEL_NAME,
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
-    return response.text;
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    return response.text();
   } catch (error) {
     console.error("テキストの最適化中にエラーが発生しました:", error);
     if (error instanceof Error) {
@@ -112,11 +111,9 @@ ${textToRefine}
 `;
 
   try {
-    const response: GenerateContentResponse = await genAI.models.generateContent({
-        model: GEMINI_MODEL_NAME,
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
-    return response.text;
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    return response.text();
   } catch (error) {
     console.error("テキストの修正中にエラーが発生しました:", error);
     if (error instanceof Error) {
